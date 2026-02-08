@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SecureLink Product Overview</title>
+    <title>SecureLink: Product & Simulation</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -21,6 +21,7 @@
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             -webkit-tap-highlight-color: transparent;
+            user-select: none; /* Prevents text selection while dragging */
         }
 
         body {
@@ -28,8 +29,10 @@
             color: var(--text);
             line-height: 1.6;
             overflow-x: hidden;
+            overscroll-behavior: none;
         }
 
+        /* --- HEADER --- */
         header {
             background: var(--primary);
             color: white;
@@ -37,21 +40,14 @@
             text-align: center;
         }
 
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        header p {
-            max-width: 800px;
-            margin: 0 auto;
-            opacity: 0.9;
-        }
+        header h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        header p { max-width: 800px; margin: 0 auto; opacity: 0.9; }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
+            user-select: text; /* Allow text selection in the main content */
         }
 
         .section-title {
@@ -61,8 +57,13 @@
             color: var(--primary);
             text-transform: uppercase;
             letter-spacing: 1px;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+            padding-bottom: 10px;
         }
+        .center-wrapper { text-align: center; }
 
+        /* --- PRODUCT CARDS --- */
         .product-grid {
             display: flex;
             gap: 2rem;
@@ -84,14 +85,8 @@
             transition: transform 0.3s;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card h2 {
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
+        .card:hover { transform: translateY(-5px); }
+        .card h2 { color: var(--primary); margin-bottom: 0.5rem; }
 
         .card .badge {
             display: inline-block;
@@ -104,12 +99,7 @@
             align-self: flex-start;
         }
 
-        .card-content {
-            flex-grow: 1;
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-            color: #555;
-        }
+        .card-content { flex-grow: 1; margin-bottom: 1.5rem; font-size: 0.95rem; color: #555; }
 
         .specs {
             background: #f1f1f1;
@@ -131,12 +121,15 @@
             width: 100%;
             text-transform: uppercase;
             transition: background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
+        .btn:hover { background: #2980b9; }
+        .btn::after { content: '▶'; font-size: 0.8em; }
 
-        .btn:hover {
-            background: #2980b9;
-        }
-
+        /* --- FEATURES --- */
         .features-section {
             background: white;
             padding: 3rem 1rem;
@@ -152,36 +145,23 @@
             margin-top: 2rem;
         }
 
-        .feature-item h3 {
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .feature-item h3 { color: var(--primary); margin-bottom: 0.5rem; }
+        .feature-item p { font-size: 0.9rem; color: #666; }
 
-        .feature-item p {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
+        /* --- SIMULATION OVERLAY --- */
         #sim-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: #111;
             z-index: 9999;
             display: none;
             flex-direction: column;
+            user-select: none;
         }
 
         #ui-layer {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
+            top: 20px; left: 20px; right: 20px;
             pointer-events: none;
             z-index: 10;
         }
@@ -193,20 +173,11 @@
             padding: 15px;
             border-radius: 4px;
             max-width: 400px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
-        .hud-title {
-            color: var(--accent);
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        .hud-desc {
-            font-size: 0.85rem;
-            margin-bottom: 10px;
-            color: #ccc;
-        }
+        .hud-title { color: var(--accent); font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+        .hud-desc { font-size: 0.85rem; margin-bottom: 10px; color: #ccc; }
 
         .hud-status {
             font-family: monospace;
@@ -219,14 +190,13 @@
         }
 
         .status-good { color: var(--success); }
-        .status-bad { color: var(--warning); animation: flash 1s infinite; }
+        .status-bad { color: var(--warning); animation: flash 0.5s infinite; }
 
         @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         #close-sim {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 20px; right: 20px;
             background: var(--warning);
             color: white;
             border: none;
@@ -247,13 +217,9 @@
             pointer-events: none;
             animation: pulse 2s infinite;
         }
-
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
-        canvas {
-            display: block;
-            touch-action: none;
-        }
+        canvas { display: block; touch-action: none; }
     </style>
 </head>
 <body>
@@ -265,7 +231,9 @@
 
     <div class="container">
         
-        <h2 class="section-title">Product Overview</h2>
+        <div class="center-wrapper">
+            <h2 class="section-title">Product Overview</h2>
+        </div>
 
         <div class="product-grid">
             <div class="card">
@@ -278,7 +246,7 @@
                     <strong>Battery:</strong> 6-12 months (Rechargeable)<br>
                     <strong>Range:</strong> 10-30m Bluetooth
                 </div>
-                <button class="btn" onclick="startSim('MINI')">Click to Simulate Mini</button>
+                <button class="btn" onclick="startSim('MINI')">Simulate Mini</button>
             </div>
 
             <div class="card">
@@ -291,12 +259,14 @@
                     <strong>Battery:</strong> 3-6 months<br>
                     <strong>Range:</strong> Global GPS/LTE
                 </div>
-                <button class="btn" onclick="startSim('BASIC')">Click to Simulate Basic+</button>
+                <button class="btn" onclick="startSim('BASIC')">Simulate Basic+</button>
             </div>
         </div>
 
         <div class="features-section">
-            <h2 class="section-title" style="font-size: 1.5rem; margin-top:0;">Key Features</h2>
+            <div class="center-wrapper">
+                <h2 class="section-title" style="font-size: 1.5rem; margin-top:0; border:none;">Key Features</h2>
+            </div>
             <div class="feature-grid">
                 <div class="feature-item">
                     <h3>Portable and Small</h3>
@@ -316,7 +286,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <div id="sim-overlay">
@@ -338,6 +307,7 @@
     </div>
 
     <script>
+        // --- VARIABLES ---
         const overlay = document.getElementById('sim-overlay');
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
@@ -350,9 +320,48 @@
         let mode = '';
         let zoneRadius = 0;
         let ripples = [];
+        let lastBeepTime = 0;
 
+        // Device State
         const device = { x: 0, y: 0, r: 18, dragging: false };
 
+        // Audio Context (Web Audio API)
+        let audioCtx;
+
+        // --- AUDIO ENGINE ---
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playBeep() {
+            if (!audioCtx) return;
+            
+            // Create Oscillator and Gain
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            // Sound Config (High-pitched Beep)
+            osc.type = 'square'; 
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+            osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.1); // Drop pitch
+
+            // Volume Config
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15); // Stop after 150ms
+        }
+
+        // --- INPUT HANDLERS (MOUSE + TOUCH) ---
         function getPos(e) {
             if (e.touches && e.touches.length > 0) {
                 return { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -361,6 +370,7 @@
         }
 
         function handleStart(e) {
+            initAudio(); // Initialize audio on first touch/click
             const pos = getPos(e);
             const dist = Math.hypot(pos.x - device.x, pos.y - device.y);
             if (dist < device.r * 2) {
@@ -373,7 +383,8 @@
                 const pos = getPos(e);
                 device.x = pos.x;
                 device.y = pos.y;
-                e.preventDefault();
+                // Prevent scrolling while dragging
+                if (e.cancelable) e.preventDefault(); 
             }
         }
 
@@ -381,14 +392,17 @@
             device.dragging = false;
         }
 
+        // Mouse Events
         canvas.addEventListener('mousedown', handleStart);
         window.addEventListener('mousemove', handleMove);
         window.addEventListener('mouseup', handleEnd);
 
+        // Touch Events (Passive: false required to prevent scroll)
         canvas.addEventListener('touchstart', handleStart, {passive: false});
         canvas.addEventListener('touchmove', handleMove, {passive: false});
         canvas.addEventListener('touchend', handleEnd);
 
+        // --- APP LOGIC ---
         function resize() {
             width = window.innerWidth;
             height = window.innerHeight;
@@ -403,21 +417,24 @@
         function startSim(selectedMode) {
             mode = selectedMode;
             overlay.style.display = 'flex';
+            initAudio(); // Try to wake audio up
             resize();
+            
+            // Reset Device Position
             device.x = centerX + 50;
             device.y = centerY;
             
             if (mode === 'MINI') {
-                hudTitle.innerText = "SecureLink Mini Mode";
-                hudDesc.innerText = "Bluetooth Short-Range (10-30m). Drag the device away to trigger the proximity alarm.";
-                zoneRadius = Math.min(width, height) * 0.25;
+                hudTitle.innerText = "SecureLink Mini";
+                hudDesc.innerText = "Simulating Bluetooth Range (10-30m). Drag device away to test.";
+                zoneRadius = Math.min(width, height) * 0.25; // Smaller
             } else {
-                hudTitle.innerText = "SecureLink Basic+ Mode";
-                hudDesc.innerText = "GPS Geofencing Active. Drag outside the zone to trigger Cellular Tracking.";
-                zoneRadius = Math.min(width, height) * 0.35;
+                hudTitle.innerText = "SecureLink Basic+";
+                hudDesc.innerText = "Simulating GPS Geofence. Drag device outside to trigger satellite tracking.";
+                zoneRadius = Math.min(width, height) * 0.35; // Larger
             }
 
-            animate();
+            animate(0);
         }
 
         function stopSim() {
@@ -425,15 +442,18 @@
             cancelAnimationFrame(animationId);
         }
 
-        function animate() {
+        function animate(timestamp) {
+            // Draw Background
             ctx.fillStyle = '#0f172a';
             ctx.fillRect(0, 0, width, height);
 
+            // Draw Grid
             ctx.strokeStyle = '#1e293b';
             ctx.lineWidth = 1;
             for(let i=0; i<width; i+=40) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,height); ctx.stroke(); }
             for(let i=0; i<height; i+=40) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(width,i); ctx.stroke(); }
 
+            // Draw Safe Zone
             ctx.beginPath();
             ctx.arc(centerX, centerY, zoneRadius, 0, Math.PI * 2);
             ctx.strokeStyle = 'rgba(52, 152, 219, 0.5)';
@@ -444,6 +464,7 @@
             ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
             ctx.fill();
 
+            // Draw "User/Phone" Center
             ctx.beginPath();
             ctx.arc(centerX, centerY, 15, 0, Math.PI * 2);
             ctx.fillStyle = '#3498db';
@@ -453,15 +474,18 @@
             ctx.textAlign = 'center';
             ctx.fillText("YOU", centerX, centerY + 4);
 
+            // Check Distance
             const dx = device.x - centerX;
             const dy = device.y - centerY;
             const dist = Math.hypot(dx, dy);
             const isSafe = dist < zoneRadius;
 
             if (isSafe) {
-                statusText.innerText = mode === 'MINI' ? "IN RANGE" : "SECURE";
+                // Safe State
+                statusText.innerText = "SECURE";
                 statusText.className = "status-good";
                 
+                // Connection Line
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.lineTo(device.x, device.y);
@@ -469,14 +493,23 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
             } else {
-                statusText.innerText = mode === 'MINI' ? "ALARM: LOST" : "TRACKING ON";
+                // Alarm State
+                statusText.innerText = "ALARM ACTIVE";
                 statusText.className = "status-bad";
 
+                // Visual Alarm Ripple
                 if (Math.random() > 0.85) {
                     ripples.push({x: device.x, y: device.y, r: 10, a: 1});
                 }
+
+                // Audio Alarm Trigger (Every 400ms)
+                if (timestamp - lastBeepTime > 400) {
+                    playBeep();
+                    lastBeepTime = timestamp;
+                }
             }
 
+            // Draw Device (The Drag Target)
             ctx.beginPath();
             ctx.arc(device.x, device.y, device.r, 0, Math.PI * 2);
             ctx.fillStyle = isSafe ? 'white' : '#e74c3c';
@@ -485,6 +518,7 @@
             ctx.lineWidth = 3;
             ctx.stroke();
 
+            // Animate Ripples
             for (let i = 0; i < ripples.length; i++) {
                 let r = ripples[i];
                 r.r += 2;
