@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SecureLink Product Overview</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #e74c3c;
+            --light: #ecf0f1;
+            --text: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 3rem 1.5rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        header p {
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin: 2rem 0;
+            font-size: 2rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .product-grid {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 4rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            border-top: 5px solid var(--accent);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card .badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            align-self: flex-start;
+        }
+
+        .card-content {
+            flex-grow: 1;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            color: #555;
+        }
+
+        .specs {
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .features-section {
+            background: white;
+            padding: 3rem 1rem;
+            margin-top: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-item h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-item p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        #sim-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #111;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .hud-box {
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid #444;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            max-width: 400px;
+        }
+
+        .hud-title {
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .hud-desc {
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+
+        .hud-status {
+            font-family: monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding-top: 5px;
+            border-top: 1px solid #555;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .status-good { color: var(--success); }
+        .status-bad { color: var(--warning); animation: flash 1s infinite; }
+
+        @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        #close-sim {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--warning);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .instruction {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+            pointer-events: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        canvas {
+            display: block;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>SecureLink</h1>
+        <p>Prevent loss before it happens. SecureLink attaches to your valuables and alerts you the moment they go out of range.</p>
+    </header>
+
+    <div class="container">
+        
+        <h2 class="section-title">Product Overview</h2>
+
+        <div class="product-grid">
+            <div class="card">
+                <h2>SecureLink Mini</h2>
+                <span class="badge">Indoor / Short-Range</span>
+                <div class="card-content">
+                    Bluetooth-only proximity sensor. Connects to smartphone for short-range (10-30m) alerts and alarms if item is moved or left behind. Ideal for indoor/crowded areas like schools/offices.
+                </div>
+                <div class="specs">
+                    <strong>Battery:</strong> 6-12 months (Rechargeable)<br>
+                    <strong>Range:</strong> 10-30m Bluetooth
+                </div>
+                <button class="btn" onclick="startSim('MINI')">Click to Simulate Mini</button>
+            </div>
+
+            <div class="card">
+                <h2>SecureLink Basic+</h2>
+                <span class="badge">Global Tracking</span>
+                <div class="card-content">
+                    Builds on Mini with added GPS/LTE for global tracking. Uses cellular for real-time location beyond Bluetooth range, with geofencing alerts. Requires SIM card.
+                </div>
+                <div class="specs">
+                    <strong>Battery:</strong> 3-6 months<br>
+                    <strong>Range:</strong> Global GPS/LTE
+                </div>
+                <button class="btn" onclick="startSim('BASIC')">Click to Simulate Basic+</button>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <h2 class="section-title" style="font-size: 1.5rem; margin-top:0;">Key Features</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h3>Portable and Small</h3>
+                    <p>Lightweight and compact design (fits in a pocket or under a vehicle) for discreet, on-the-go use.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Secure</h3>
+                    <p>Features tamper-proof casing, encrypted data transmission, and geofencing alerts to prevent unauthorized movement.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Easy Setup</h3>
+                    <p>Plug-and-play installation with magnetic attachment or simple pairing via Bluetooth/app, no tools or wiring needed.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Simple Interface</h3>
+                    <p>User-friendly app controls for setup, monitoring, and alerts, with minimal learning curve.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="sim-overlay">
+        <button id="close-sim" onclick="stopSim()">EXIT DEMO</button>
+        
+        <div id="ui-layer">
+            <div class="hud-box">
+                <div class="hud-title" id="hud-title">SYSTEM READY</div>
+                <div class="hud-desc" id="hud-desc">Initializing...</div>
+                <div class="hud-status">
+                    <span>STATUS:</span>
+                    <span id="status-text" class="status-good">CONNECTED</span>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="simCanvas"></canvas>
+        <div class="instruction">TAP & DRAG THE DOT TO TEST RANGE</div>
+    </div>
+
+    <script>
+        const overlay = document.getElementById('sim-overlay');
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const hudTitle = document.getElementById('hud-title');
+        const hudDesc = document.getElementById('hud-desc');
+        const statusText = document.getElementById('status-text');
+
+        let width, height, centerX, centerY;
+        let animationId;
+        let mode = '';
+        let zoneRadius = 0;
+        let ripples = [];
+
+        const device = { x: 0, y: 0, r: 18, dragging: false };
+
+        function getPos(e) {
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        function handleStart(e) {
+            const pos = getPos(e);
+            const dist = Math.hypot(pos.x - device.x, pos.y - device.y);
+            if (dist < device.r * 2) {
+                device.dragging = true;
+            }
+        }
+
+        function handleMove(e) {
+            if (device.dragging) {
+                const pos = getPos(e);
+                device.x = pos.x;
+                device.y = pos.y;
+                e.preventDefault();
+            }
+        }
+
+        function handleEnd() {
+            device.dragging = false;
+        }
+
+        canvas.addEventListener('mousedown', handleStart);
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleEnd);
+
+        canvas.addEventListener('touchstart', handleStart, {passive: false});
+        canvas.addEventListener('touchmove', handleMove, {passive: false});
+        canvas.addEventListener('touchend', handleEnd);
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            centerX = width / 2;
+            centerY = height / 2;
+        }
+
+        window.addEventListener('resize', resize);
+
+        function startSim(selectedMode) {
+            mode = selectedMode;
+            overlay.style.display = 'flex';
+            resize();
+            device.x = centerX + 50;
+            device.y = centerY;
+            
+            if (mode === 'MINI') {
+                hudTitle.innerText = "SecureLink Mini Mode";
+                hudDesc.innerText = "Bluetooth Short-Range (10-30m). Drag the device away to trigger the proximity alarm.";
+                zoneRadius = Math.min(width, height) * 0.25;
+            } else {
+                hudTitle.innerText = "SecureLink Basic+ Mode";
+                hudDesc.innerText = "GPS Geofencing Active. Drag outside the zone to trigger Cellular Tracking.";
+                zoneRadius = Math.min(width, height) * 0.35;
+            }
+
+            animate();
+        }
+
+        function stopSim() {
+            overlay.style.display = 'none';
+            cancelAnimationFrame(animationId);
+        }
+
+        function animate() {
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for(let i=0; i<width; i+=40) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,height); ctx.stroke(); }
+            for(let i=0; i<height; i+=40) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(width,i); ctx.stroke(); }
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, zoneRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(52, 152, 219, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([15, 10]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#3498db';
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.font = '10px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText("YOU", centerX, centerY + 4);
+
+            const dx = device.x - centerX;
+            const dy = device.y - centerY;
+            const dist = Math.hypot(dx, dy);
+            const isSafe = dist < zoneRadius;
+
+            if (isSafe) {
+                statusText.innerText = mode === 'MINI' ? "IN RANGE" : "SECURE";
+                statusText.className = "status-good";
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(device.x, device.y);
+                ctx.strokeStyle = '#27ae60';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            } else {
+                statusText.innerText = mode === 'MINI' ? "ALARM: LOST" : "TRACKING ON";
+                statusText.className = "status-bad";
+
+                if (Math.random() > 0.85) {
+                    ripples.push({x: device.x, y: device.y, r: 10, a: 1});
+                }
+            }
+
+            ctx.beginPath();
+            ctx.arc(device.x, device.y, device.r, 0, Math.PI * 2);
+            ctx.fillStyle = isSafe ? 'white' : '#e74c3c';
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            for (let i = 0; i < ripples.length; i++) {
+                let r = ripples[i];
+                r.r += 2;
+                r.a -= 0.03;
+                ctx.beginPath();
+                ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(231, 76, 60, ${r.a})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                if (r.a <= 0) ripples.splice(i, 1);
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+    </script>
+</body>
+</html>
